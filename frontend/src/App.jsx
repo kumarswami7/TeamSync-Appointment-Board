@@ -55,6 +55,8 @@ export default function App() {
     }, 4500);
   }, []);
 
+  const API_BASE = import.meta.env.VITE_API_URL || '';
+
   // Fetch appointments from API
   const fetchAppointments = useCallback(async () => {
     setLoading(true);
@@ -64,7 +66,7 @@ export default function App() {
       if (statusFilter && statusFilter !== 'all') params.append('status', statusFilter);
       if (searchQuery) params.append('search', searchQuery);
 
-      const res = await fetch(`/api/appointments?${params.toString()}`);
+      const res = await fetch(`${API_BASE}/api/appointments?${params.toString()}`);
       if (!res.ok) {
         throw new Error(`Failed to load appointments (status ${res.status})`);
       }
@@ -75,7 +77,7 @@ export default function App() {
     } finally {
       setLoading(false);
     }
-  }, [dateFilter, statusFilter, searchQuery, showToast]);
+  }, [dateFilter, statusFilter, searchQuery, showToast, API_BASE]);
 
   useEffect(() => {
     fetchAppointments();
@@ -83,7 +85,7 @@ export default function App() {
 
   // Handle Save (Add or Update)
   const handleSaveAppointment = async (formData, editingId) => {
-    const url = editingId ? `/api/appointments/${editingId}` : '/api/appointments';
+    const url = editingId ? `${API_BASE}/api/appointments/${editingId}` : `${API_BASE}/api/appointments`;
     const method = editingId ? 'PUT' : 'POST';
 
     const res = await fetch(url, {
@@ -110,7 +112,7 @@ export default function App() {
   // Handle Status Update (Complete / Cancel / Reactivate)
   const handleStatusChange = async (appointmentId, newStatus) => {
     try {
-      const res = await fetch(`/api/appointments/${appointmentId}/status`, {
+      const res = await fetch(`${API_BASE}/api/appointments/${appointmentId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
@@ -139,7 +141,7 @@ export default function App() {
   // Handle Reset Samples
   const handleResetSeed = async () => {
     try {
-      const res = await fetch('/api/appointments/reset-seed', { method: 'POST' });
+      const res = await fetch(`${API_BASE}/api/appointments/reset-seed`, { method: 'POST' });
       if (!res.ok) throw new Error('Failed to reset sample data');
       setDateFilter('');
       setStatusFilter('all');
