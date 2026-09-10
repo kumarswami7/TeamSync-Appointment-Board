@@ -55,7 +55,8 @@ export default function App() {
     }, 4500);
   }, []);
 
-  const API_BASE = import.meta.env.VITE_API_URL || '';
+  const rawApiBase = import.meta.env.VITE_API_URL || '';
+  const API_BASE = rawApiBase.replace(/\/+$/, '');
 
   // Fetch appointments from API
   const fetchAppointments = useCallback(async () => {
